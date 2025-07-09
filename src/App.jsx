@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
-import "./App.css"; // Assumeix que aquí poses els estils
+import "./app.css"; // Assumeix que aquí poses els estils
 
 const ingredientesGenericos = {
   Pimiento: ["Pimiento verde", "Pimiento rojo", "Pimiento amarillo"],
