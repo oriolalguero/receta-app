@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
+import "src/app.css";
 
 const ingredientesGenericos = {
   Pimiento: ["Pimiento verde", "Pimiento rojo", "Pimiento amarillo"],
