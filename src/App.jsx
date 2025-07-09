@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import jsPDF from "jspdf";
-import "src/app.css";
+import "./App.css"; // Assumeix que aquí poses els estils
 
 const ingredientesGenericos = {
   Pimiento: ["Pimiento verde", "Pimiento rojo", "Pimiento amarillo"],
@@ -10,9 +10,7 @@ const ingredientesGenericos = {
 const acciones = ["Cortar", "Saltear", "Hervir", "Freír", "Hornear"];
 
 function App() {
-  // Estats
   const [ingredientes, setIngredientes] = useState(() => {
-    // Cargar de localStorage si existe
     const saved = localStorage.getItem("ingredientes");
     return saved ? JSON.parse(saved) : [];
   });
@@ -25,7 +23,6 @@ function App() {
   const [error, setError] = useState("");
   const [editIndex, setEditIndex] = useState(null);
 
-  // Guardar cambios en localStorage
   useEffect(() => {
     localStorage.setItem("ingredientes", JSON.stringify(ingredientes));
   }, [ingredientes]);
@@ -38,7 +35,6 @@ function App() {
     localStorage.setItem("notas", notas);
   }, [notas]);
 
-  // Funcions
   const validarIngrediente = () => {
     if (!nuevoIngrediente.generico) return "Selecciona un ingrediente genérico.";
     if (!nuevoIngrediente.especifico) return "Selecciona un ingrediente específico.";
@@ -55,13 +51,11 @@ function App() {
     }
     setError("");
     if (editIndex !== null) {
-      // Editar
       const nuevos = [...ingredientes];
       nuevos[editIndex] = nuevoIngrediente;
       setIngredientes(nuevos);
       setEditIndex(null);
     } else {
-      // Agregar nuevo
       setIngredientes([...ingredientes, nuevoIngrediente]);
     }
     setNuevoIngrediente({ generico: "", especifico: "", peso: 0, accion: "" });
@@ -106,20 +100,18 @@ function App() {
 
   const handleComensalesChange = (e) => {
     const val = parseInt(e.target.value);
-    if (val < 1) return; // mínimo 1
+    if (val < 1) return;
     setComensales(val);
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6 font-sans">
-      <h1 className="text-4xl font-bold text-center">Crear Receta</h1>
+    <div className="container">
+      <h1 className="title">Crear Receta</h1>
 
-      {/* Form ingredientes */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 items-end">
-        <div>
-          <label className="block mb-1 font-semibold">Ingrediente Genérico</label>
+      <div className="form-grid">
+        <div className="form-group">
+          <label>Ingrediente Genérico</label>
           <select
-            className="w-full border rounded p-2"
             value={nuevoIngrediente.generico}
             onChange={(e) =>
               setNuevoIngrediente({ ...nuevoIngrediente, generico: e.target.value, especifico: "" })
@@ -132,10 +124,9 @@ function App() {
           </select>
         </div>
 
-        <div>
-          <label className="block mb-1 font-semibold">Ingrediente Específico</label>
+        <div className="form-group">
+          <label>Ingrediente Específico</label>
           <select
-            className="w-full border rounded p-2"
             value={nuevoIngrediente.especifico}
             onChange={(e) => setNuevoIngrediente({ ...nuevoIngrediente, especifico: e.target.value })}
             disabled={!nuevoIngrediente.generico}
@@ -147,12 +138,11 @@ function App() {
           </select>
         </div>
 
-        <div>
-          <label className="block mb-1 font-semibold">Peso (g)</label>
+        <div className="form-group">
+          <label>Peso (g)</label>
           <input
             type="number"
             min="0"
-            className="w-full border rounded p-2"
             value={nuevoIngrediente.peso}
             onChange={(e) =>
               setNuevoIngrediente({ ...nuevoIngrediente, peso: parseFloat(e.target.value) || 0 })
@@ -160,10 +150,9 @@ function App() {
           />
         </div>
 
-        <div>
-          <label className="block mb-1 font-semibold">Acción</label>
+        <div className="form-group">
+          <label>Acción</label>
           <select
-            className="w-full border rounded p-2"
             value={nuevoIngrediente.accion}
             onChange={(e) => setNuevoIngrediente({ ...nuevoIngrediente, accion: e.target.value })}
           >
@@ -174,87 +163,60 @@ function App() {
           </select>
         </div>
 
-        <div>
+        <div className="form-group">
           <button
-            className={`w-full py-2 rounded font-semibold text-white ${
-              validarIngrediente() ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-            }`}
             onClick={agregarIngrediente}
             disabled={!!validarIngrediente()}
+            className={validarIngrediente() ? "btn-disabled" : "btn-primary"}
           >
             {editIndex !== null ? "Guardar Cambios" : "Agregar Ingrediente"}
           </button>
         </div>
       </div>
 
-      {error && <p className="text-red-600 font-semibold">{error}</p>}
+      {error && <p className="error">{error}</p>}
 
-      {/* Número de comensales */}
-      <div className="max-w-xs">
-        <label className="block mb-1 font-semibold">Número de comensales</label>
+      <div className="small-form-group">
+        <label>Número de comensales</label>
         <input
           type="number"
           min="1"
-          className="w-full border rounded p-2"
           value={comensales}
           onChange={handleComensalesChange}
         />
       </div>
 
-      {/* Notas */}
-      <div>
-        <label className="block mb-1 font-semibold">Notas para la receta</label>
+      <div className="form-group">
+        <label>Notas para la receta</label>
         <textarea
           rows="3"
-          className="w-full border rounded p-2"
           placeholder="Ejemplo: Presentación festiva, acompañar con salsa especial..."
           value={notas}
           onChange={(e) => setNotas(e.target.value)}
         />
       </div>
 
-      {/* Llista ingredientes */}
       <div>
-        <h2 className="text-2xl font-semibold mb-2">Ingredientes</h2>
-        {ingredientes.length === 0 && <p className="italic text-gray-600">No hay ingredientes agregados.</p>}
-        <ul className="space-y-2">
+        <h2>Ingredientes</h2>
+        {ingredientes.length === 0 && <p>No hay ingredientes agregados.</p>}
+        <ul className="ingredientes-list">
           {ingredientes.map((ing, i) => (
-            <li
-              key={i}
-              className="border rounded p-3 flex justify-between items-center bg-gray-50"
-            >
+            <li key={i} className="ingrediente-item">
+              <span>{`${ing.accion} ${ing.especifico} (${ing.peso * comensales}g)`}</span>
               <div>
-                {`${ing.accion} ${ing.especifico} (${ing.peso * comensales}g)`}
-              </div>
-              <div className="space-x-2">
-                <button
-                  onClick={() => editarIngrediente(i)}
-                  className="text-blue-600 hover:underline"
-                  aria-label={`Editar ingrediente ${i + 1}`}
-                >
-                  Editar
-                </button>
-                <button
-                  onClick={() => eliminarIngrediente(i)}
-                  className="text-red-600 hover:underline"
-                  aria-label={`Eliminar ingrediente ${i + 1}`}
-                >
-                  Eliminar
-                </button>
+                <button onClick={() => editarIngrediente(i)} className="btn-link">Editar</button>
+                <button onClick={() => eliminarIngrediente(i)} className="btn-link btn-danger">Eliminar</button>
               </div>
             </li>
           ))}
         </ul>
       </div>
 
-      {/* Exportar PDF */}
-      <div className="text-center">
+      <div className="centered">
         <button
           onClick={handleExportPDF}
           disabled={ingredientes.length === 0}
-          className={`mt-6 px-6 py-3 rounded font-semibold text-white ${
-            ingredientes.length === 0 ? "bg-gray-400 cursor-not-allowed" : "bg-green-600 hover:bg-green-700"
-          }`}
+          className={ingredientes.length === 0 ? "btn-disabled" : "btn-success"}
         >
           Exportar PDF
         </button>
